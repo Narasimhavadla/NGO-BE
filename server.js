@@ -14,21 +14,28 @@ app.use(cors())
 app.use("api/v1/uploads", express.static("src/uploads"));
 
 
-const {initDb,UserModel,EventsModel} = require("./src/modals")
+const {initDb,UserModel,EventsModel,VolunteerModal,DonationModal} = require("./src/modals")
 
 const authRouters = require("./src/routes/authRouter")
 const eventRouter = require("./src/routes/eventRouter")
+const volunteerRouter = require("./src/routes/volunteer.router")
+const donationRouter = require("./src/routes/donationRouter")
 
 
 app.use((req, res, next) => {
   req.userModel = UserModel;
   req.EventsModel = EventsModel;
+  req.VolunteerModal = VolunteerModal
+req.DonationModal = DonationModal
+
   next();
 });
 
 
 app.use("/api/v1",authRouters)
 app.use("/api/v1",eventRouter)
+app.use("/api/v1",volunteerRouter)
+app.use("/api/v1",donationRouter)
 
 
 

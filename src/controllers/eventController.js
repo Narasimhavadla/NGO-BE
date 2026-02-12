@@ -1,58 +1,72 @@
 const fs = require("fs");
 const path = require("path");
+const { QueryTypes, } = require("sequelize");
+const sequelize = require("../config/db"); 
 
 const eventController = {
 
   // ✅ CREATE EVENT
-  createEvent: async (req, res) => {
-    try {
-      const { title, dateOfEvent, location, participants,content } = req.body;
+ createEvent: async (req, res) => {
+  try {
+    const { title, dateOfEvent, location, participants, content, status } = req.body;
 
-      if (!title || !dateOfEvent) {
-        return res.status(400).send({
-          status: false,
-          message: "Required fields are missing",
-        });
-      }
-
-      const imagePath = req.file
-        ? req.file.filename
-        : null;
-
-      const event = await req.EventsModel.create({
-        title,
-        dateOfEvent,
-        location,
-        participants,
-        content,
-        image: imagePath,
-      });
-
-      res.status(201).send({
-        status: true,
-        message: "Event created successfully",
-        data: event,
-      });
-
-    } catch (err) {
-      console.error(err);
-      res.status(500).send({
+    if (!title || !dateOfEvent) {
+      return res.status(400).send({
         status: false,
-        message: "Failed to create event",
+        message: "Required fields are missing",
       });
     }
-  },
+
+    const imagePath = req.file ? req.file.filename : null;
+
+    const event = await sequelize.query(
+      `INSERT INTO Events
+       (title, dateOfEvent, location, participants, content, image, createdAt, updatedAt, status)
+       VALUES
+       (:title, :dateOfEvent, :location, :participants, :content, :image, NOW(), NOW(), :status)`,
+      {
+        replacements: {
+          title,
+          dateOfEvent,
+          location,
+          participants,
+          content,
+          image: imagePath,
+          status,
+        },
+        type: QueryTypes.INSERT,
+      }
+    );
+
+    res.status(201).send({
+      status: true,
+      message: "Event created successfully",
+      data: event,
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({
+      status: false,
+      message: "Failed to create event",
+    });
+  }
+},
+
 
   // ✅ GET ALL
   getAllEvents: async (req, res) => {
     try {
-      const events = await req.EventsModel.findAll({
-        order: [["id", "DESC"]],
-      });
+      const events = await sequelize.query(
+        "SELECT * FROM Events ORDER BY ID DESC",{
+          type : QueryTypes.SELECT
+        }
+      )
 
       res.send({
         status: true,
         data: events,
+        meta : {total_events : events.length}
       });
 
     } catch (err) {
@@ -64,33 +78,41 @@ const eventController = {
     }
   },
 
-  // ✅ GET SINGLE
-  getSingleEvent: async (req, res) => {
-    try {
-      const { id } = req.params;
+  // ✅ GET SINGL
 
-      const event = await req.EventsModel.findByPk(id);
+getSingleEvent: async (req, res) => {
+  try {
+    const { id } = req.params;
 
-      if (!event) {
-        return res.status(404).send({
-          status: false,
-          message: "Event not found",
-        });
+    const event = await sequelize.query(
+      "SELECT * FROM Events WHERE id = :id",
+      {
+        replacements: { id },
+        type: QueryTypes.SELECT,
       }
+    );
 
-      res.send({
-        status: true,
-        data: event,
-      });
-
-    } catch (err) {
-      console.error(err);
-      res.status(500).send({
+    if (!event || event.length === 0) {
+      return res.status(404).send({
         status: false,
-        message: "Failed to fetch event",
+        message: "Event not found",
       });
     }
-  },
+
+    res.send({
+      status: true,
+      data: event[0],
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({
+      status: false,
+      message: "Failed to fetch event",
+    });
+  }
+},
+
 
   // ✅ UPDATE EVENT
   updateEvent: async (req, res) => {

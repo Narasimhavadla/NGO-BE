@@ -1,48 +1,50 @@
-const {sequelize,DataTypes} = require("sequelize")
+const sequelize = require("sequelize")
 
-const creatEvents = (sequelize) =>{
+const {DataTypes} = require("sequelize")
+
+const createVolunteer = (sequelize) =>{
     return sequelize.define(
-        "Events",{
+        "Volunteer",{
             id : {
                 type : DataTypes.INTEGER,
-                autoIncrement : true,
-                primaryKey : true
+                primaryKey : true,
+                autoIncrement : true
             },
-            title : { 
+            name : {
                 type : DataTypes.STRING,
                 allowNull : false
             },
-            dateOfEvent : {
-                type : DataTypes.DATE,
+            email : {
+                type : DataTypes.STRING,
                 allowNull : false
             },
-            location : {
-                type :DataTypes.STRING,
-                allowNull : true
+            phone : {
+                type : DataTypes.STRING,
+                allowNull : false
             },
-            participants : {
+            city : {
+                type : DataTypes.STRING,
+                allowNull : false
+            },
+            role : {
                 type : DataTypes.STRING,
                 allowNull : true
             },
-            image :{
-                type : DataTypes.STRING,
-                allowNull : true
-            },
-            content : {
+            description : {
                 type : DataTypes.STRING,
                 allowNull : true
             },
             status : {
                 type : DataTypes.STRING,
-                allowNull : false
+                allowNull : null
             }
         },
         {
-            tableName : "Events",
+            tableName : "Volunteer",
             timestamps : true
         }
     )
 }
 
 
-module.exports = creatEvents
+module.exports = createVolunteer

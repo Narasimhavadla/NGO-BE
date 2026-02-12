@@ -17,6 +17,10 @@ const createUsers = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      phone: {
+        type : DataTypes.STRING,
+        allowNull : false
+      },
       role: {
         type: DataTypes.STRING,
         allowNull: false,

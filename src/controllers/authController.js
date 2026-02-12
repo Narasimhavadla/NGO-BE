@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt")
 
 exports.register = async (req,res) =>{
     try{
-        const {username,password,role} = req.body
+        const {username,password,phone,role} = req.body
 
         if(!username || !password || !role){
             return res.status(400).send({
@@ -18,6 +18,7 @@ exports.register = async (req,res) =>{
         const user = await req.userModel.create({
             username ,
             password : hashedPassword,
+            phone,
             role
         })
 
