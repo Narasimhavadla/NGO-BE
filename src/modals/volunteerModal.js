@@ -14,6 +14,10 @@ const createVolunteer = (sequelize) =>{
                 type : DataTypes.STRING,
                 allowNull : false
             },
+            image:{
+                type : DataTypes.STRING,
+                allowNull : true
+            },
             email : {
                 type : DataTypes.STRING,
                 allowNull : false
@@ -36,11 +40,11 @@ const createVolunteer = (sequelize) =>{
             },
             status : {
                 type : DataTypes.STRING,
-                allowNull : null
+                allowNull : true
             }
         },
         {
-            tableName : "Volunteer",
+            tableName : "Volunteers",
             timestamps : true
         }
     )

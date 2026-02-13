@@ -1,15 +1,26 @@
-const express = require("express")
+const express = require("express");
+const router = express.Router();
+const controller = require("../controllers/volunteerController");
+const upload = require("../middleware/upload"); // multer-cloudinary
 
-const router = express.Router()
+router.get("/volunteers", controller.getAllVolunteers);
+router.get("/volunteer/:id", controller.getVolunteerById);
 
-const controller = require("../controllers/volunteerController")
+router.post(
+  "/volunteer",
+  upload.single("image"),   // ✅ upload image
+  controller.createVolunteer
+);
 
-router.get("/volunteers",controller.getAllVolunteers)
-router.get("/volunteer/:id",controller.getVolunteerById)
-router.post("/volunteer",controller.createVolunteer)
-router.put("/volunteer/:id",controller.updateVolunteer)
-router.delete("/volunteer/:id",controller.deleteVolunteer)
+router.put(
+  "/volunteer/:id",
+  upload.single("image"),   // ✅ replace image
+  controller.updateVolunteer
+);
 
+router.delete(
+  "/volunteer/:id",
+  controller.deleteVolunteer
+);
 
-
-module.exports = router
+module.exports = router;

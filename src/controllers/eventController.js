@@ -2,13 +2,68 @@ const fs = require("fs");
 const path = require("path");
 const { QueryTypes, } = require("sequelize");
 const sequelize = require("../config/db"); 
+const cloudinary = require("../config/cloudinary");
+
 
 const eventController = {
 
   // ✅ CREATE EVENT
- createEvent: async (req, res) => {
+//  createEvent: async (req, res) => {
+//   try {
+//     const { title, dateOfEvent, location, participants, content, status } = req.body;
+
+//     if (!title || !dateOfEvent) {
+//       return res.status(400).send({
+//         status: false,
+//         message: "Required fields are missing",
+//       });
+//     }
+
+//     const imagePath = req.file ? req.file.filename : null;
+
+//     const event = await sequelize.query(
+//       `INSERT INTO Events
+//        (title, dateOfEvent, location, participants, content, image, createdAt, updatedAt, status)
+//        VALUES
+//        (:title, :dateOfEvent, :location, :participants, :content, :image, NOW(), NOW(), :status)`,
+//       {
+//         replacements: {
+//           title,
+//           dateOfEvent,
+//           location,
+//           participants,
+//           content,
+//           image: imagePath,
+//           status,
+//         },
+//         type: QueryTypes.INSERT,
+//       }
+//     );
+
+//     res.status(201).send({
+//       status: true,
+//       message: "Event created successfully",
+//       data: event,
+//     });
+
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).send({
+//       status: false,
+//       message: "Failed to create event",
+//     });
+//   }
+// },
+createEvent: async (req, res) => {
   try {
-    const { title, dateOfEvent, location, participants, content, status } = req.body;
+    const {
+      title,
+      dateOfEvent,
+      location,
+      participants,
+      content,
+      status,
+    } = req.body;
 
     if (!title || !dateOfEvent) {
       return res.status(400).send({
@@ -17,26 +72,18 @@ const eventController = {
       });
     }
 
-    const imagePath = req.file ? req.file.filename : null;
+    // 🌩️ Cloudinary Image URL
+    const imageUrl = req.file ? req.file.path : null;
 
-    const event = await sequelize.query(
-      `INSERT INTO Events
-       (title, dateOfEvent, location, participants, content, image, createdAt, updatedAt, status)
-       VALUES
-       (:title, :dateOfEvent, :location, :participants, :content, :image, NOW(), NOW(), :status)`,
-      {
-        replacements: {
-          title,
-          dateOfEvent,
-          location,
-          participants,
-          content,
-          image: imagePath,
-          status,
-        },
-        type: QueryTypes.INSERT,
-      }
-    );
+    const event = await req.EventsModel.create({
+      title,
+      dateOfEvent,
+      location,
+      participants,
+      content,
+      status,
+      image: imageUrl,
+    });
 
     res.status(201).send({
       status: true,
@@ -48,10 +95,11 @@ const eventController = {
     console.error(err);
     res.status(500).send({
       status: false,
-      message: "Failed to create event",
+      message: err.message,
     });
   }
 },
+
 
 
   // ✅ GET ALL
@@ -115,102 +163,198 @@ getSingleEvent: async (req, res) => {
 
 
   // ✅ UPDATE EVENT
-  updateEvent: async (req, res) => {
-    try {
-      const { id } = req.params;
+  // updateEvent: async (req, res) => {
+  //   try {
+  //     const { id } = req.params;
 
-      const event = await req.EventsModel.findByPk(id);
+  //     const event = await req.EventsModel.findByPk(id);
 
-      if (!event) {
-        return res.status(404).send({
-          status: false,
-          message: "Event not found",
-        });
-      }
+  //     if (!event) {
+  //       return res.status(404).send({
+  //         status: false,
+  //         message: "Event not found",
+  //       });
+  //     }
 
-      let imagePath = event.image;
+  //     let imagePath = event.image;
 
-      // If new image uploaded → delete old image
-      if (req.file) {
+  //     // If new image uploaded → delete old image
+  //     if (req.file) {
 
-        if (event.image) {
-          const oldImagePath = path.join(
-            __dirname,
-            "../uploads",
-            event.image
-          );
+  //       if (event.image) {
+  //         const oldImagePath = path.join(
+  //           __dirname,
+  //           "../uploads",
+  //           event.image
+  //         );
 
-          if (fs.existsSync(oldImagePath)) {
-            fs.unlinkSync(oldImagePath);
-          }
-        }
+  //         if (fs.existsSync(oldImagePath)) {
+  //           fs.unlinkSync(oldImagePath);
+  //         }
+  //       }
 
-        imagePath = req.file.filename;
-      }
+  //       imagePath = req.file.filename;
+  //     }
 
-      await event.update({
-        ...req.body,
-        image: imagePath,
-      });
+  //     await event.update({
+  //       ...req.body,
+  //       image: imagePath,
+  //     });
 
-      res.send({
-        status: true,
-        message: "Event updated successfully",
-        data: event,
-      });
+  //     res.send({
+  //       status: true,
+  //       message: "Event updated successfully",
+  //       data: event,
+  //     });
 
-    } catch (err) {
-      console.error(err);
-      res.status(500).send({
+  //   } catch (err) {
+  //     console.error(err);
+  //     res.status(500).send({
+  //       status: false,
+  //       message: "Failed to update event",
+  //     });
+  //   }
+  // },
+
+updateEvent: async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const event = await req.EventsModel.findByPk(id);
+
+    if (!event) {
+      return res.status(404).send({
         status: false,
-        message: "Failed to update event",
+        message: "Event not found",
       });
     }
-  },
+
+    let imageUrl = event.image;
+
+    // 📸 If new image uploaded
+    if (req.file) {
+
+      // 🔥 Delete old image from Cloudinary
+      if (event.image) {
+        const publicId = event.image
+          .split("/")
+          .pop()
+          .split(".")[0];
+
+        await cloudinary.uploader.destroy(
+          `ngo_uploads/${publicId}`
+        );
+      }
+
+      imageUrl = req.file.path;
+    }
+
+    await event.update({
+      ...req.body,
+      image: imageUrl,
+    });
+
+    res.send({
+      status: true,
+      message: "Event updated successfully",
+      data: event,
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({
+      status: false,
+      message: err.message,
+    });
+  }
+},
+
 
   // ✅ DELETE EVENT + IMAGE
+  // deleteEvent: async (req, res) => {
+  //   try {
+  //     const { id } = req.params;
+
+  //     const event = await req.EventsModel.findByPk(id);
+
+  //     if (!event) {
+  //       return res.status(404).send({
+  //         status: false,
+  //         message: "Event not found",
+  //       });
+  //     }
+
+  //     // 🔥 Delete image from folder
+  //     if (event.image) {
+  //       const imagePath = path.join(
+  //         __dirname,
+  //         "../uploads",
+  //         event.image
+  //       );
+
+  //       if (fs.existsSync(imagePath)) {
+  //         fs.unlinkSync(imagePath);
+  //       }
+  //     }
+
+  //     // Delete DB record
+  //     await event.destroy();
+
+  //     res.send({
+  //       status: true,
+  //       message: "Event deleted successfully",
+  //     });
+
+  //   } catch (err) {
+  //     console.error(err);
+  //     res.status(500).send({
+  //       status: false,
+  //       message: "Failed to delete event",
+  //     });
+  //   }
+  // },
+
   deleteEvent: async (req, res) => {
-    try {
-      const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-      const event = await req.EventsModel.findByPk(id);
+    const event = await req.EventsModel.findByPk(id);
 
-      if (!event) {
-        return res.status(404).send({
-          status: false,
-          message: "Event not found",
-        });
-      }
-
-      // 🔥 Delete image from folder
-      if (event.image) {
-        const imagePath = path.join(
-          __dirname,
-          "../uploads",
-          event.image
-        );
-
-        if (fs.existsSync(imagePath)) {
-          fs.unlinkSync(imagePath);
-        }
-      }
-
-      // Delete DB record
-      await event.destroy();
-
-      res.send({
-        status: true,
-        message: "Event deleted successfully",
-      });
-
-    } catch (err) {
-      console.error(err);
-      res.status(500).send({
+    if (!event) {
+      return res.status(404).send({
         status: false,
-        message: "Failed to delete event",
+        message: "Event not found",
       });
     }
-  },
+
+    // 🔥 Delete image from Cloudinary
+    if (event.image) {
+      const publicId = event.image
+        .split("/")
+        .pop()
+        .split(".")[0];
+
+      await cloudinary.uploader.destroy(
+        `ngo_uploads/${publicId}`
+      );
+    }
+
+    await event.destroy();
+
+    res.send({
+      status: true,
+      message: "Event deleted successfully",
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({
+      status: false,
+      message: err.message,
+    });
+  }
+},
+
 };
 
 module.exports = eventController;
