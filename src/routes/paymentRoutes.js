@@ -1,0 +1,14 @@
+const express = require("express");
+const router = express.Router();
+
+const {
+  createOrder,
+  verifyPayment,
+  addOfflineDonation
+} = require("../controllers/paymentController");
+
+router.post("/create-order", createOrder);
+router.post("/verify-payment", verifyPayment);
+router.post("/offline-payment",addOfflineDonation );
+
+module.exports = router;

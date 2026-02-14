@@ -14,13 +14,14 @@ app.use(cors())
 app.use("/api/v1/uploads", express.static("src/uploads"));
 
 
-const {initDb,UserModel,EventsModel,VolunteerModal,DonationModal,TeamModal} = require("./src/modals")
+const {initDb,UserModel,EventsModel,VolunteerModal,DonationModal,TeamModal,DonationPaymentModal} = require("./src/modals")
 
 const authRouters = require("./src/routes/authRouter")
 const eventRouter = require("./src/routes/eventRouter")
 const volunteerRouter = require("./src/routes/volunteer.router")
 const donationRouter = require("./src/routes/donationRouter")
 const teamRouter = require("./src/routes/teamRouter")
+const donationPaymentRouter = require("./src/routes/paymentRoutes")
 
 
 app.use((req, res, next) => {
@@ -29,6 +30,7 @@ app.use((req, res, next) => {
   req.VolunteerModal = VolunteerModal
   req.DonationModal = DonationModal
   req.TeamModal = TeamModal
+  req.DonationPaymentModal = DonationPaymentModal
 
   next();
 });
@@ -39,6 +41,7 @@ app.use("/api/v1",eventRouter)
 app.use("/api/v1",volunteerRouter)
 app.use("/api/v1",donationRouter)
 app.use("/api/v1",teamRouter)
+app.use("/api/v1",donationPaymentRouter)
 
 
 

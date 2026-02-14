@@ -12,6 +12,10 @@ const creatEvents = (sequelize) =>{
                 type : DataTypes.STRING,
                 allowNull : false
             },
+             time: {
+                type: DataTypes.TIME,
+                allowNull: true,
+            },
             dateOfEvent : {
                 type : DataTypes.DATE,
                 allowNull : false

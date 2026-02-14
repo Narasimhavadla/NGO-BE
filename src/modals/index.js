@@ -5,12 +5,14 @@ const createEvent = require("./events")
 const createVolunteer = require("./volunteerModal")
 const createDonation = require("./donation")
 const createTeam = require("./team")
+const createDonationPayments = require("./donationPayments")
 
 const UserModel = createUsers(sequelize);
 const EventsModel = createEvent(sequelize)
 const VolunteerModal = createVolunteer(sequelize)
 const DonationModal = createDonation(sequelize)
 const TeamModal = createTeam(sequelize)
+const DonationPaymentModal = createDonationPayments(sequelize)
 
 const initDb = async () => {
   try {
@@ -36,4 +38,5 @@ module.exports = {
   VolunteerModal,
   DonationModal,
   TeamModal,
+  DonationPaymentModal,
 };
