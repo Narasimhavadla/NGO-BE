@@ -7,53 +7,7 @@ const cloudinary = require("../config/cloudinary");
 
 const eventController = {
 
-  // ✅ CREATE EVENT
-//  createEvent: async (req, res) => {
-//   try {
-//     const { title, dateOfEvent, location, participants, content, status } = req.body;
 
-//     if (!title || !dateOfEvent) {
-//       return res.status(400).send({
-//         status: false,
-//         message: "Required fields are missing",
-//       });
-//     }
-
-//     const imagePath = req.file ? req.file.filename : null;
-
-//     const event = await sequelize.query(
-//       `INSERT INTO Events
-//        (title, dateOfEvent, location, participants, content, image, createdAt, updatedAt, status)
-//        VALUES
-//        (:title, :dateOfEvent, :location, :participants, :content, :image, NOW(), NOW(), :status)`,
-//       {
-//         replacements: {
-//           title,
-//           dateOfEvent,
-//           location,
-//           participants,
-//           content,
-//           image: imagePath,
-//           status,
-//         },
-//         type: QueryTypes.INSERT,
-//       }
-//     );
-
-//     res.status(201).send({
-//       status: true,
-//       message: "Event created successfully",
-//       data: event,
-//     });
-
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).send({
-//       status: false,
-//       message: "Failed to create event",
-//     });
-//   }
-// },
 createEvent: async (req, res) => {
   try {
     const {

@@ -1,4 +1,9 @@
 const sequelize = require("sequelize")
+const generateVolunteerCard = require("../utils/generateVolunteerCard");
+const uploadIdCardToCloudinary = require("../utils/uploadIdCardToCloudinary");
+const sendVolunteerEmail = require("../utils/sendVolunteerEmail");
+
+
 
 const cloudinary = require("../config/cloudinary");
 
@@ -188,6 +193,71 @@ const volunteerController = {
     });
   }
 },
+
+updateVolunteerStatus: async (req, res) => {
+  try {
+    const { status } = req.body;
+
+    const volunteer =
+      await req.VolunteerModal.findByPk(
+        req.params.id
+      );
+
+    if (!volunteer) {
+      return res.status(404).send({
+        status: false,
+        message: "Volunteer not found",
+      });
+    }
+
+    const oldStatus = volunteer.status;
+
+    // Update only status
+    volunteer.status = status;
+    await volunteer.save();
+
+    // 🎯 Trigger only if pending → active
+    if (
+      oldStatus === "pending" &&
+      status === "active"
+    ) {
+      // Generate Volunteer ID
+      const volunteerId = `VOL-${Date.now()}`;
+
+      volunteer.volunteerId = volunteerId;
+      await volunteer.save();
+
+      // Generate ID Card
+      const filePath =
+        await generateVolunteerCard(volunteer);
+
+      // Upload to Cloudinary
+      const idCardUrl =
+        await uploadIdCardToCloudinary(filePath);
+
+      volunteer.idCardUrl = idCardUrl;
+      await volunteer.save();
+
+      // Send Email
+      await sendVolunteerEmail(
+        volunteer,
+        idCardUrl
+      );
+    }
+
+    res.status(200).send({
+      status: true,
+      message: "Status updated successfully",
+      data: volunteer,
+    });
+  } catch (err) {
+    res.status(500).send({
+      status: false,
+      message: err.message,
+    });
+  }
+},
+
 
 }
 

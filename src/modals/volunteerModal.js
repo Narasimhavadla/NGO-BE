@@ -41,7 +41,15 @@ const createVolunteer = (sequelize) =>{
             status : {
                 type : DataTypes.STRING,
                 allowNull : true
-            }
+            },
+            volunteerId: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
+            idCardUrl: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
         },
         {
             tableName : "Volunteers",

@@ -13,6 +13,7 @@
   "type": "commonjs",
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "canvas": "^3.2.1",
     "cloudinary": "^1.41.3",
     "cors": "^2.8.6",
     "crypto": "^1.0.1",
@@ -22,7 +23,10 @@
     "multer": "^2.0.2",
     "multer-storage-cloudinary": "^4.0.0",
     "mysql2": "^3.16.3",
+    "nodemailer": "^8.0.1",
     "nodemon": "^3.1.11",
+    "pdfkit": "^0.17.2",
+    "qrcode": "^1.5.4",
     "razorpay": "^2.9.6",
     "sequelize": "^6.37.7"
   }

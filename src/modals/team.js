@@ -27,7 +27,12 @@ const createTeam = (sequelize) =>{
             email : {
                 type : DataTypes.STRING,
                 allowNull : true
+            },
+            isPinned : {
+                type : DataTypes.BOOLEAN,
+                defaultValue : false
             }
+
         },
         {
             tableName : "Team",

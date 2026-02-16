@@ -27,4 +27,8 @@ router.put(
 // DELETE
 router.delete("/team/:id", teamController.deleteMember);
 
+// PIN / UNPIN
+router.put("/team/pin/:id", teamController.togglePinMember);
+
+
 module.exports = router;

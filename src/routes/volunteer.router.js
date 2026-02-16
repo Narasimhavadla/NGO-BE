@@ -23,4 +23,9 @@ router.delete(
   controller.deleteVolunteer
 );
 
+router.patch(
+  "/volunteer-status/:id",
+  controller.updateVolunteerStatus
+);
+
 module.exports = router;
