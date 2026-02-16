@@ -1,7 +1,6 @@
 const { createCanvas, loadImage } = require("canvas");
 const QRCode = require("qrcode");
-const fs = require("fs");
-const path = require("path");
+const cloudinary = require("../config/cloudinary");
 
 const generateVolunteerCard = async (volunteer) => {
   const width = 900;
@@ -10,28 +9,36 @@ const generateVolunteerCard = async (volunteer) => {
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext("2d");
 
-  // Background
+  /**
+   * 🎨 Background
+   */
   ctx.fillStyle = "#f3f4f6";
   ctx.fillRect(0, 0, width, height);
 
-  // Header
+  /**
+   * 🔵 Header
+   */
   ctx.fillStyle = "#2563eb";
   ctx.fillRect(0, 0, width, 120);
 
-  ctx.fillStyle = "#ffffff";
+  ctx.fillStyle = "#fff";
   ctx.font = "bold 40px Arial";
-  ctx.fillText("Helping Hands NGO", 30, 70);
+  ctx.fillText("Dhatrutha Being a Giver", 30, 70);
 
   ctx.font = "20px Arial";
   ctx.fillText("Volunteer Access Badge", 30, 105);
 
-  // Volunteer Image
+  /**
+   * 👤 Volunteer Image
+   */
   if (volunteer.image) {
     const img = await loadImage(volunteer.image);
     ctx.drawImage(img, 40, 160, 150, 150);
   }
 
-  // Details
+  /**
+   * 📄 Details
+   */
   ctx.fillStyle = "#000";
   ctx.font = "28px Arial";
   ctx.fillText(volunteer.name, 230, 190);
@@ -43,7 +50,9 @@ const generateVolunteerCard = async (volunteer) => {
   ctx.fillText(volunteer.email, 230, 350);
   ctx.fillText(volunteer.city, 230, 390);
 
-  // QR Code Data
+  /**
+   * 🔳 QR CODE
+   */
   const qrData = JSON.stringify({
     id: volunteer.volunteerId,
     name: volunteer.name,
@@ -55,16 +64,30 @@ const generateVolunteerCard = async (volunteer) => {
 
   ctx.drawImage(qr, 680, 200, 150, 150);
 
-  // Save Image
-  const filePath = path.join(
-    __dirname,
-    `../temp/${volunteer.volunteerId}.png`
-  );
-
+  /**
+   * ✅ Convert canvas → BUFFER
+   */
   const buffer = canvas.toBuffer("image/png");
-  fs.writeFileSync(filePath, buffer);
 
-  return filePath;
+  /**
+   * ☁️ Upload DIRECTLY to Cloudinary
+   */
+  const uploadResult = await new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: "ngo_id_cards",
+        resource_type: "image",
+      },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result);
+      }
+    );
+
+    stream.end(buffer);
+  });
+
+  return uploadResult.secure_url;
 };
 
 module.exports = generateVolunteerCard;

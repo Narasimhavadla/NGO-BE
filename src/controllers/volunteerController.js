@@ -194,14 +194,95 @@ const volunteerController = {
   }
 },
 
+// updateVolunteerStatus: async (req, res) => {
+//   try {
+//     const { status } = req.body;
+
+//     const volunteer = await req.VolunteerModal.findByPk(
+//       req.params.id
+//     );
+
+//     if (!volunteer) {
+//       return res.status(404).send({
+//         status: false,
+//         message: "Volunteer not found",
+//       });
+//     }
+
+//     const oldStatus = volunteer.status;
+
+//     // ✅ prevent duplicate activation
+//     if (oldStatus === "active" && status === "active") {
+//       return res.status(200).send({
+//         status: true,
+//         message: "Volunteer already active",
+//         data: volunteer,
+//       });
+//     }
+
+//     volunteer.status = status;
+//     await volunteer.save();
+
+//     /**
+//      * 🎯 ONLY FIRST TIME ACTIVATION
+//      */
+//     if (oldStatus === "pending" && status === "active") {
+
+//       // ✅ Generate ID only once
+//       const volunteerId = `VOL-${Date.now()}`;
+//       volunteer.volunteerId = volunteerId;
+//       await volunteer.save();
+
+//       // 1️⃣ Generate Card
+//       // const filePath = await generateVolunteerCard(volunteer);
+
+//       // 2️⃣ Upload to Cloudinary
+//       // const idCardUrl = await uploadIdCardToCloudinary(filePath);
+
+//       const idCardUrl =
+//         await generateVolunteerCard(volunteer);
+
+
+//       volunteer.idCardUrl = idCardUrl;
+//       await volunteer.save();
+
+//       // 3️⃣ Send Email (SAFE MODE)
+//       try {
+//         await sendVolunteerEmail(volunteer, idCardUrl);
+//       } catch (mailError) {
+//         console.error("Email failed:", mailError.message);
+//       }
+
+//       // ✅ delete temp file (VERY IMPORTANT)
+//       const fs = require("fs");
+//       if (fs.existsSync(filePath)) {
+//         fs.unlinkSync(filePath);
+//       }
+//     }
+
+//     res.status(200).send({
+//       status: true,
+//       message: "Status updated successfully",
+//       data: volunteer,
+//     });
+
+//   } catch (err) {
+//     res.status(500).send({
+//       status: false,
+//       message: err.message,
+//     });
+//   }
+// },
+
+
+
 updateVolunteerStatus: async (req, res) => {
   try {
     const { status } = req.body;
 
-    const volunteer =
-      await req.VolunteerModal.findByPk(
-        req.params.id
-      );
+    const volunteer = await req.VolunteerModal.findByPk(
+      req.params.id
+    );
 
     if (!volunteer) {
       return res.status(404).send({
@@ -212,37 +293,32 @@ updateVolunteerStatus: async (req, res) => {
 
     const oldStatus = volunteer.status;
 
-    // Update only status
+    // ✅ Update status
     volunteer.status = status;
     await volunteer.save();
 
-    // 🎯 Trigger only if pending → active
-    if (
-      oldStatus === "pending" &&
-      status === "active"
-    ) {
-      // Generate Volunteer ID
-      const volunteerId = `VOL-${Date.now()}`;
+    /**
+     * 🎯 Only when pending → active
+     */
+    if (oldStatus === "pending" && status === "active") {
 
+      // ✅ Generate Volunteer ID
+      const volunteerId = `VOL-${Date.now()}`;
       volunteer.volunteerId = volunteerId;
       await volunteer.save();
 
-      // Generate ID Card
-      const filePath =
-        await generateVolunteerCard(volunteer);
+      /**
+       * ✅ Generate card + Upload DIRECTLY to Cloudinary
+       * (returns URL now — NOT filepath)
+       */
+      const idCardUrl = await generateVolunteerCard(volunteer);
 
-      // Upload to Cloudinary
-      const idCardUrl =
-        await uploadIdCardToCloudinary(filePath);
-
+      // ✅ Save URL
       volunteer.idCardUrl = idCardUrl;
       await volunteer.save();
 
-      // Send Email
-      await sendVolunteerEmail(
-        volunteer,
-        idCardUrl
-      );
+      // ✅ Send Email
+      await sendVolunteerEmail(volunteer, idCardUrl);
     }
 
     res.status(200).send({
@@ -250,13 +326,17 @@ updateVolunteerStatus: async (req, res) => {
       message: "Status updated successfully",
       data: volunteer,
     });
+
   } catch (err) {
+    console.error(err);
     res.status(500).send({
       status: false,
       message: err.message,
     });
   }
 },
+
+
 
 
 }
