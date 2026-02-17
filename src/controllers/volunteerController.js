@@ -1,6 +1,6 @@
 const sequelize = require("sequelize")
 const generateVolunteerCard = require("../utils/generateVolunteerCard");
-const uploadIdCardToCloudinary = require("../utils/uploadIdCardToCloudinary");
+// const uploadIdCardToCloudinary = require("../utils/uploadIdCardToCloudinary");
 const sendVolunteerEmail = require("../utils/sendVolunteerEmail");
 
 

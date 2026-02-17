@@ -14,7 +14,7 @@ app.use(cors())
 app.use("/api/v1/uploads", express.static("src/uploads"));
 
 
-const {initDb,UserModel,EventsModel,VolunteerModal,DonationModal,TeamModal,DonationPaymentModal} = require("./src/modals")
+const {initDb,UserModel,EventsModel,VolunteerModal,DonationModal,TeamModal,DonationPaymentModal,GalleryModal,Program} = require("./src/modals")
 
 const authRouters = require("./src/routes/authRouter")
 const eventRouter = require("./src/routes/eventRouter")
@@ -22,15 +22,21 @@ const volunteerRouter = require("./src/routes/volunteer.router")
 const donationRouter = require("./src/routes/donationRouter")
 const teamRouter = require("./src/routes/teamRouter")
 const donationPaymentRouter = require("./src/routes/paymentRoutes")
+const galleryRouter = require("./src/routes/galleryRouter");
+const programRouter = require("./src/routes/programRouter")
+
 
 
 app.use((req, res, next) => {
-  req.userModel = UserModel;
-  req.EventsModel = EventsModel;
+  req.userModel = UserModel
+  req.EventsModel = EventsModel
   req.VolunteerModal = VolunteerModal
   req.DonationModal = DonationModal
   req.TeamModal = TeamModal
   req.DonationPaymentModal = DonationPaymentModal
+  req.GalleryModal = GalleryModal
+  req.Program = Program
+
 
   next();
 });
@@ -42,6 +48,9 @@ app.use("/api/v1",volunteerRouter)
 app.use("/api/v1",donationRouter)
 app.use("/api/v1",teamRouter)
 app.use("/api/v1",donationPaymentRouter)
+app.use("/api/v1", galleryRouter);
+app.use("/api/v1", programRouter);
+
 
 
 
