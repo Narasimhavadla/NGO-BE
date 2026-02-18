@@ -18,6 +18,7 @@ createEvent: async (req, res) => {
       participants,
       content,
       status,
+      // donationFor
     } = req.body;
 
     if (!title || !dateOfEvent) {
@@ -39,6 +40,7 @@ createEvent: async (req, res) => {
       content,
       status,
       image: imageUrl,
+      // donationFor
     });
 
     res.status(201).send({

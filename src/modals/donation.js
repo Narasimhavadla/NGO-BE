@@ -24,6 +24,10 @@ const createDonation = (sequelize) =>{
             amount : {
                 type : DataTypes.STRING,
                 allowNull : false
+            },
+            donationFor : {
+                type : DataTypes.STRING,
+                allowNull : true
             }
         },
         {

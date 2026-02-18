@@ -31,6 +31,14 @@ const createTeam = (sequelize) =>{
             isPinned : {
                 type : DataTypes.BOOLEAN,
                 defaultValue : false
+            },
+            instaUrl : {
+                type : DataTypes.STRING,
+                allowNull : true
+            },
+            xUrl : {
+                type : DataTypes.STRING,
+                allowNull : true
             }
 
         },

@@ -9,7 +9,7 @@ const teamController = {
 
     createMember : async (req, res) => {
   try {
-    const { name, designation, email, phone } = req.body;
+    const { name, designation, email, phone,instaUrl } = req.body;
 
     const imageUrl = req.file ? req.file.path : null;
 
@@ -19,6 +19,7 @@ const teamController = {
       email,
       phone,
       image: imageUrl, 
+      instaUrl
     });
 
     res.send({

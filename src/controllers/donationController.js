@@ -26,7 +26,7 @@ const donationController = {
 
     createDonation : async (req,res) =>{
         try{
-            const {name,email,phone,amount} = req.body
+            const {name,email,phone,amount , donationFor} = req.body
 
             if(!name || !email || !phone || !amount){
                 return res.status(400).send({
@@ -40,7 +40,8 @@ const donationController = {
                 name,
                 email,
                 phone,
-                amount
+                amount,
+                donationFor
         })
 
 
@@ -89,7 +90,7 @@ const donationController = {
     updateDonation : async (req,res) =>{
         try{
 
-            const {name,email,phone,amount} = req.body
+            const {name,email,phone,amount,donationFor} = req.body
 
             const donation = await req.DonationModal.findByPk(req.params.id)
 
@@ -104,7 +105,8 @@ const donationController = {
                 name : name ?? donation.name,
                 email : email ?? donation.email,
                 phone : phone ?? donation.phone,
-                amount : amount ?? donation.amount
+                amount : amount ?? donation.amount,
+                donationFor : donationFor ?? donation.donationFor
             })
 
             res.status(200).send({

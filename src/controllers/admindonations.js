@@ -13,6 +13,9 @@ const adminDonationsController = {
         new Date().getMonth(),
         1
       );
+      const startOfYear = new Date(
+        new Date().getFullYear(),0,1
+      );
 
       const today = new Date();
 
@@ -24,6 +27,14 @@ const adminDonationsController = {
         },
       });
 
+      const yearlyTotal = await req.DonationPaymentModal.sum("amount",{
+        where : {
+          createdAt : {
+            [Op.between] : [startOfYear,today]
+          }
+        }
+      })
+
       res.status(200).send({
         status: true,
         message: "Fetched payments successfully",
@@ -31,7 +42,8 @@ const adminDonationsController = {
         meta: {
           total_count: donationPayment.length,
           donorsCount: donorsCount,
-          monthlyTotal: monthlyTotal || 0
+          monthlyTotal: monthlyTotal || 0,
+          yearlyTotal : yearlyTotal || 0,
         },
       });
 

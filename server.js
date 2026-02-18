@@ -24,6 +24,7 @@ const teamRouter = require("./src/routes/teamRouter")
 const donationPaymentRouter = require("./src/routes/paymentRoutes")
 const galleryRouter = require("./src/routes/galleryRouter");
 const programRouter = require("./src/routes/programRouter")
+const dashBoardRouter = require("./src/routes/dashboardRoutes")
 
 
 
@@ -50,6 +51,7 @@ app.use("/api/v1",teamRouter)
 app.use("/api/v1",donationPaymentRouter)
 app.use("/api/v1", galleryRouter);
 app.use("/api/v1", programRouter);
+app.use("/api/v1", dashBoardRouter);
 
 
 

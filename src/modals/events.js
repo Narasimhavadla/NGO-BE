@@ -39,7 +39,11 @@ const creatEvents = (sequelize) =>{
             status : {
                 type : DataTypes.STRING,
                 allowNull : false
-            }
+            },
+            // donationFor : {
+            //     type : DataTypes.STRING,
+            //     allowNull : true
+            // }
         },
         {
             tableName : "Events",
