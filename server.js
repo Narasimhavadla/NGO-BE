@@ -14,7 +14,7 @@ app.use(cors())
 app.use("/api/v1/uploads", express.static("src/uploads"));
 
 
-const {initDb,UserModel,EventsModel,VolunteerModal,DonationModal,TeamModal,DonationPaymentModal,GalleryModal,Program} = require("./src/modals")
+const {initDb,UserModel,EventsModel,VolunteerModal,DonationModal,TeamModal,DonationPaymentModal,GalleryModal,Program,CalenderAvailabilityModal} = require("./src/modals")
 
 const authRouters = require("./src/routes/authRouter")
 const eventRouter = require("./src/routes/eventRouter")
@@ -25,7 +25,7 @@ const donationPaymentRouter = require("./src/routes/paymentRoutes")
 const galleryRouter = require("./src/routes/galleryRouter");
 const programRouter = require("./src/routes/programRouter")
 const dashBoardRouter = require("./src/routes/dashboardRoutes")
-
+const calenderAvailabilityRouter = require("./src/routes/calenderAvailabilityRouter");
 
 
 app.use((req, res, next) => {
@@ -37,6 +37,7 @@ app.use((req, res, next) => {
   req.DonationPaymentModal = DonationPaymentModal
   req.GalleryModal = GalleryModal
   req.Program = Program
+  req.CalenderAvailabilityModal =  CalenderAvailabilityModal
 
 
   next();
@@ -52,6 +53,7 @@ app.use("/api/v1",donationPaymentRouter)
 app.use("/api/v1", galleryRouter);
 app.use("/api/v1", programRouter);
 app.use("/api/v1", dashBoardRouter);
+app.use("/api/v1", calenderAvailabilityRouter);
 
 
 

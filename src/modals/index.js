@@ -8,6 +8,8 @@ const createTeam = require("./team")
 const createDonationPayments = require("./donationPayments")
 const createGallery = require("./galleryModal");
 const createProgram = require("./program")
+const createCalenderAvailability = require("./calenderAvailability")
+const createBulkEmail = require("./bukEmial")
 
 
 const UserModel = createUsers(sequelize);
@@ -18,6 +20,8 @@ const TeamModal = createTeam(sequelize)
 const DonationPaymentModal = createDonationPayments(sequelize)
 const GalleryModal = createGallery(sequelize);
 const Program = createProgram(sequelize)
+const CalenderAvailabilityModal = createCalenderAvailability(sequelize)
+const BulkEmail = createBulkEmail(sequelize)
 
 
 const initDb = async () => {
@@ -47,4 +51,6 @@ module.exports = {
   DonationPaymentModal,
   GalleryModal,
   Program,
+  CalenderAvailabilityModal,
+  BulkEmail,
 };

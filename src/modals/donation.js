@@ -1,5 +1,6 @@
 const {sequelize,DataTypes }= require("sequelize")
 
+  
 
 const createDonation = (sequelize) =>{
     return sequelize.define(
